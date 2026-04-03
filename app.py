@@ -159,7 +159,7 @@ history, forecast, metrics = load_data()
 latest_all = history.sort_values("year").groupby("district").last().reset_index()
 latest_all["zone_type"] = latest_all["district"].map(ZONE_MASTER).fillna("inland")
 
-year_2025   = int(history["year"].max())   # latest year in DB (2025 or closest)
+year_2025   = int(history["year"].max())
 current_sspi = (
     history[history["year"]==year_2025]
     [["district","sspi","ndvi","rainfall_annual","temp_rabi"]].copy()
@@ -186,6 +186,13 @@ sel_for_data = st.session_state.sel if st.session_state.sel else all_districts[0
 # ══════════════════════════════════════════════════════════════════════════════
 # CSS
 # ══════════════════════════════════════════════════════════════════════════════
+_clr_critical = CLR["Critical"]
+_clr_high     = CLR["High"]
+_clr_moderate = CLR["Moderate"]
+_clr_low      = CLR["Low"]
+_live_bg      = '#1b5e20' if st.session_state.theme == 'dark' else '#e8f5e9'
+_live_color   = '#a5d6a7' if st.session_state.theme == 'dark' else '#2e7d32'
+
 st.markdown(f"""<style>
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
 html,body,[class*="css"]{{font-family:'DM Sans',sans-serif;background:{T["bg"]};color:{T["text_pri"]};}}
@@ -216,8 +223,8 @@ div[data-baseweb="popover"] li:hover{{background:{T["border"]} !important;}}
 .kpi-sub{{font-size:.62rem;color:{T["text_sec"]};margin-top:.12rem;}}
 .sh{{font-size:.68rem;font-weight:700;color:{T["text_sec"]};text-transform:uppercase;letter-spacing:.1em;border-left:3px solid {T["accent"]};padding-left:.5rem;margin:1rem 0 .6rem;}}
 .ic{{background:{T["card"]};border:1px solid {T["border"]};border-radius:10px;padding:.9rem 1.1rem;margin-bottom:.55rem;transition:border-color .2s;}}
-.ic.Critical{{border-color:{CLR["Critical"]};}} .ic.High{{border-color:{CLR["High"]};}}
-.ic.Moderate{{border-color:{CLR["Moderate"]};}} .ic.Low{{border-color:{CLR["Low"]};}}
+.ic.Critical{{border-color:{_clr_critical};}} .ic.High{{border-color:{_clr_high};}}
+.ic.Moderate{{border-color:{_clr_moderate};}} .ic.Low{{border-color:{_clr_low};}}
 .zb{{display:inline-block;font-size:.58rem;font-weight:700;padding:.14rem .5rem;border-radius:20px;letter-spacing:.05em;text-transform:uppercase;}}
 .zb-coastal{{background:rgba(2,136,209,.15);color:#29b6f6;border:1px solid #0288d1;}}
 .zb-canal{{background:rgba(156,39,176,.15);color:#ce93d8;border:1px solid #9c27b0;}}
@@ -239,7 +246,7 @@ div[data-baseweb="popover"] li:hover{{background:{T["border"]} !important;}}
 .app-hdr{{background:{T["hdr_grad"]};border:1px solid {T["border"]};border-radius:14px;padding:1rem 1.6rem;margin-bottom:.8rem;display:flex;align-items:center;justify-content:space-between;}}
 .app-title{{font-size:1.35rem;font-weight:700;color:{T["text_pri"]};margin:0;}}
 .app-sub{{font-size:.72rem;color:{T["text_sec"]};margin:.2rem 0 0;line-height:1.5;}}
-.live-dot{{background:{'#1b5e20' if st.session_state.theme=='dark' else '#e8f5e9'};border:1px solid #43a047;color:{'#a5d6a7' if st.session_state.theme=='dark' else '#2e7d32'};font-size:.63rem;font-weight:700;padding:.2rem .7rem;border-radius:20px;animation:pulse 2s infinite;}}
+.live-dot{{background:{_live_bg};border:1px solid #43a047;color:{_live_color};font-size:.63rem;font-weight:700;padding:.2rem .7rem;border-radius:20px;animation:pulse 2s infinite;}}
 @keyframes pulse{{0%,100%{{opacity:1;}}50%{{opacity:.6;}}}}
 .acc-banner{{background:{T["hdr_grad"]};border:2px solid {T["accent"]};border-radius:14px;padding:1.1rem 1.4rem;text-align:center;box-shadow:0 0 22px rgba(79,195,247,.12);}}
 .acc-ring{{font-size:3.4rem;font-weight:900;font-family:'Space Mono',monospace;background:linear-gradient(135deg,{T["accent"]},#43a047);-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1.1;}}
@@ -451,8 +458,8 @@ with tab1:
             st.markdown(f"<div class='sh'>🗺️ Interactive Map — <span style='color:#43a047'>Current Salinity {year_2025}</span> (actual SSPI)</div>",unsafe_allow_html=True)
             map_source=current_sspi.copy()
         else:
-           _critical_clr = CLR["Critical"]
-st.markdown(f"<div class='sh'>🗺️ Interactive Map — <span style='color:{_critical_clr}'>Forecast 2030</span> (predicted SSPI)</div>",unsafe_allow_html=True)
+            _fc_clr = CLR["Critical"]
+            st.markdown(f"<div class='sh'>🗺️ Interactive Map — <span style='color:{_fc_clr}'>Forecast 2030</span> (predicted SSPI)</div>",unsafe_allow_html=True)
             fore_2030=forecast[forecast["year"]==2030][["district","predicted_sspi"]].copy()
             fore_2030["sspi_class"]=fore_2030["predicted_sspi"].apply(compute_sspi_class)
             fore_2030["zone_type"]=fore_2030["district"].map(ZONE_MASTER).fillna("inland")
@@ -516,13 +523,14 @@ st.markdown(f"<div class='sh'>🗺️ Interactive Map — <span style='color:{_c
 
         # ── MAP LEGEND ────────────────────────────────────────────────────────
         layer_label=f"Current SSPI {year_2025}" if st.session_state.map_layer=="Current 2025" else "Predicted SSPI 2030"
+        _lc = CLR["Critical"]; _lh = CLR["High"]; _lm = CLR["Moderate"]; _ll = CLR["Low"]
         legend=(f"<div style='position:fixed;bottom:20px;left:20px;background:#0f2040;padding:10px 14px;"
                 f"border-radius:8px;border:1px solid #1e3a6e;color:#e8f0fe;font-family:sans-serif;font-size:11px;z-index:9999'>"
                 f"<b>{layer_label}</b><br>"
-                f"<span style='color:{CLR[\"Critical\"]}'>●</span> Critical ≥75<br>"
-                f"<span style='color:{CLR[\"High\"]}'>●</span> High 50–74<br>"
-                f"<span style='color:{CLR[\"Moderate\"]}'>●</span> Moderate 25–49<br>"
-                f"<span style='color:{CLR[\"Low\"]}'>●</span> Low &lt;25<br>"
+                f"<span style='color:{_lc}'>●</span> Critical ≥75<br>"
+                f"<span style='color:{_lh}'>●</span> High 50–74<br>"
+                f"<span style='color:{_lm}'>●</span> Moderate 25–49<br>"
+                f"<span style='color:{_ll}'>●</span> Low &lt;25<br>"
                 f"<hr style='border-color:#1e3a6e;margin:4px 0'>"
                 f"<span style='color:#29b6f6'>●</span> Coastal &nbsp;<span style='color:#ce93d8'>●</span> Canal<br>"
                 f"<span style='color:#ffb74d'>●</span> Inland &nbsp;<span style='color:#81c784'>●</span> Hilly</div>")
@@ -625,12 +633,13 @@ st.markdown(f"<div class='sh'>🗺️ Interactive Map — <span style='color:{_c
                   </div>
                 </div>""",unsafe_allow_html=True)
 
+            _clr_low_env = CLR["Low"]; _clr_high_env = CLR["High"]
             st.markdown(f"""<div class='ic'>
               <div style='font-size:.58rem;color:{T["text_sec"]};text-transform:uppercase;letter-spacing:.07em;margin-bottom:.5rem'>Environmental Metrics</div>
               <div style='display:grid;grid-template-columns:1fr 1fr;gap:.5rem'>
-                <div><div style='font-size:.58rem;color:{T["text_sec"]}'>🌿 NDVI</div><div style='font-size:1.05rem;font-weight:700;color:{CLR["Low"]}'>{ndvi_avg:.3f}</div></div>
+                <div><div style='font-size:.58rem;color:{T["text_sec"]}'>🌿 NDVI</div><div style='font-size:1.05rem;font-weight:700;color:{_clr_low_env}'>{ndvi_avg:.3f}</div></div>
                 <div><div style='font-size:.58rem;color:{T["text_sec"]}'>🌧️ Rainfall</div><div style='font-size:1.05rem;font-weight:700;color:{T["accent"]}'>{rain_avg:.0f} mm</div></div>
-                <div><div style='font-size:.58rem;color:{T["text_sec"]}'>🌡️ Rabi Temp</div><div style='font-size:1.05rem;font-weight:700;color:{CLR["High"]}'>{temp_avg:.1f}°C</div></div>
+                <div><div style='font-size:.58rem;color:{T["text_sec"]}'>🌡️ Rabi Temp</div><div style='font-size:1.05rem;font-weight:700;color:{_clr_high_env}'>{temp_avg:.1f}°C</div></div>
                 <div><div style='font-size:.58rem;color:{T["text_sec"]}'>🔮 2030 SSPI</div><div style='font-size:1.05rem;font-weight:700;color:{clr_sel}'>{f"{sspi_2030:.1f}" if sspi_2030 else "—"}</div></div>
               </div></div>""",unsafe_allow_html=True)
 
@@ -757,11 +766,12 @@ with tab3:
     rc5=st.columns(5)
     for i,(_,r) in enumerate(fore30.head(10).iterrows()):
         rc=sc(compute_sspi_class(r["predicted_sspi"]))
+        _rp = min(r["predicted_sspi"], 100)
         with rc5[i%5]:
             st.markdown(f"<div class='ic' style='text-align:center;padding:.6rem .5rem'>"
                         f"<div style='font-size:.7rem;color:{T['text_pri']};font-weight:600;margin-bottom:.2rem'>{r['district']}</div>"
                         f"<div style='font-size:1.35rem;font-weight:800;font-family:Space Mono,monospace;color:{rc}'>{r['predicted_sspi']:.1f}</div>"
-                        f"<div class='gauge' style='margin:.3rem 0'><div class='gfill' style='width:{min(r[\"predicted_sspi\"],100):.0f}%;background:{rc}'></div></div></div>",
+                        f"<div class='gauge' style='margin:.3rem 0'><div class='gfill' style='width:{_rp:.0f}%;background:{rc}'></div></div></div>",
                         unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -878,13 +888,15 @@ with tab4:
                            .highlight_min(subset=["MAE","RMSE"],color="#1b3a6e")
                            .format(fmt,na_rep="—"),use_container_width=True)
 
+    _clr_low_f  = CLR["Low"]
+    _clr_high_f = CLR["High"]
     st.markdown(f"""<div class='ic' style='margin-top:.8rem'>
       <div style='font-size:.6rem;color:{T["text_sec"]};text-transform:uppercase;letter-spacing:.08em;margin-bottom:.6rem'>SSPI Formula</div>
       <code style='color:{T["accent"]};font-size:.83rem'>SSPI = (0.40 × NDVI_deficit + 0.35 × Rainfall_deficit + 0.25 × Temp_anomaly) × 100</code>
       <div style='display:grid;grid-template-columns:1fr 1fr 1fr;gap:.5rem;margin-top:.7rem'>
-        <div style='font-size:.73rem;color:{T["text_sec"]}'>🌿 <b style='color:{CLR["Low"]}'>NDVI deficit 40%</b><br>Vegetation stress proxy</div>
+        <div style='font-size:.73rem;color:{T["text_sec"]}'>🌿 <b style='color:{_clr_low_f}'>NDVI deficit 40%</b><br>Vegetation stress proxy</div>
         <div style='font-size:.73rem;color:{T["text_sec"]}'>🌧️ <b style='color:{T["accent"]}'>Rainfall deficit 35%</b><br>Low rain → salt accumulation</div>
-        <div style='font-size:.73rem;color:{T["text_sec"]}'>🌡️ <b style='color:{CLR["High"]}'>Temp anomaly 25%</b><br>High temp → capillary rise</div>
+        <div style='font-size:.73rem;color:{T["text_sec"]}'>🌡️ <b style='color:{_clr_high_f}'>Temp anomaly 25%</b><br>High temp → capillary rise</div>
       </div></div>""",unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════════════════════
