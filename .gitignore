@@ -1,0 +1,16 @@
+# Large data files — do NOT push to GitHub
+data/raw/
+data/processed/*.csv
+data/processed/*.sqlite
+data/processed/*.pkl
+data/processed/*.ckpt
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
