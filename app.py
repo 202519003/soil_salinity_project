@@ -451,7 +451,8 @@ with tab1:
             st.markdown(f"<div class='sh'>🗺️ Interactive Map — <span style='color:#43a047'>Current Salinity {year_2025}</span> (actual SSPI)</div>",unsafe_allow_html=True)
             map_source=current_sspi.copy()
         else:
-            _critical_clr = CLR["Critical"] st.markdown(f"<div class='sh'>🗺️ Interactive Map — <span style='color:{_critical_clr}'>Forecast 2030</span> (predicted SSPI)</div>",unsafe_allow_html=True)
+           _critical_clr = CLR["Critical"]
+st.markdown(f"<div class='sh'>🗺️ Interactive Map — <span style='color:{_critical_clr}'>Forecast 2030</span> (predicted SSPI)</div>",unsafe_allow_html=True)
             fore_2030=forecast[forecast["year"]==2030][["district","predicted_sspi"]].copy()
             fore_2030["sspi_class"]=fore_2030["predicted_sspi"].apply(compute_sspi_class)
             fore_2030["zone_type"]=fore_2030["district"].map(ZONE_MASTER).fillna("inland")
