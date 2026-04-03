@@ -136,7 +136,7 @@ def zb(z): return f"<span class='zb zb-{z}'>{ZONE_ICON.get(z,'')} {z.upper()}</s
 # ══════════════════════════════════════════════════════════════════════════════
 @st.cache_data
 def load_data():
-    db = "data/processed/salinity_db.sqlite"
+    db = "data/Processed/salinity_db.sqlite"  
     if not os.path.exists(db):
         st.error("❌ Database not found: data/processed/salinity_db.sqlite\nRun scripts 01–11 first.")
         st.stop()
