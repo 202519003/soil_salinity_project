@@ -106,8 +106,8 @@ SMART_POLICY = {
 
 DEFAULT_METRICS = pd.DataFrame({
     "model":["Linear Regression","Random Forest","XGBoost","TFT Transformer"],
-    "mae":[7.50,7.48,7.58,5.91],"rmse":[8.71,8.80,9.57,8.31],
-    "r2":[0.737,0.732,0.683,0.757],"mape":[np.nan,np.nan,np.nan,10.6]
+    "mae":[7.81,7.26,6.65,4.91],"rmse":[9.01,8.45,8.53,7.25],
+    "r2":[0.745,0.776,0.771,0.831],"mape":[np.nan,np.nan,np.nan,9.3]
 })
 
 # ══════════════════════════════════════════════════════════════════════════════
