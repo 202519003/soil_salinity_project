@@ -1,0 +1,5 @@
+model,mae,rmse,r2,mape
+Linear Regression,7.81,9.01,0.745,
+Random Forest,7.26,8.45,0.776,
+XGBoost,6.63,8.53,0.772,
+TFT Transformer,4.32,6.33,0.871,7.9

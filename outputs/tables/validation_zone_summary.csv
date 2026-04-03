@@ -1,0 +1,5 @@
+zone,coarse_acc,exact_acc,n_districts
+coastal,100.0,90.0,10
+canal,20.0,20.0,5
+inland,100.0,37.5,8
+hilly,100.0,0.0,1
