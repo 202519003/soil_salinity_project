@@ -1,16 +1,55 @@
-# Large data files — do NOT push to GitHub
-data/raw/
-data/processed/*.csv
-data/processed/*.sqlite
-data/processed/*.pkl
-data/processed/*.ckpt
-
-# Python cache
+# Python
 __pycache__/
-*.pyc
+*.py[cod]
 *.pyo
-.env
+*.pyd
+.Python
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+lib/
+lib64/
 
-# OS files
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+
+# Jupyter Notebooks
+.ipynb_checkpoints
+*.ipynb
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
 .DS_Store
 Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Models (optional - comment out if you want to keep them)
+# *.pkl
+# *.ckpt
+
+# Streamlit
+.streamlit/secrets.toml
+
+# Temp files
+*.tmp
+*.temp
